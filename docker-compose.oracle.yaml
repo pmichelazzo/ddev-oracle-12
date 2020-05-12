@@ -1,0 +1,36 @@
+version: '3.6'
+
+services:
+  oracle:
+    container_name: ddev-${DDEV_SITENAME}-oracle
+    image: quay.io/maksymbilenko/oracle-12c
+    restart: "no"
+    # Oracle is served from this port inside the container.
+    ports:
+      - 8080:8080
+      - 1521:1521
+
+    # These labels ensure this service is discoverable by ddev.
+    labels:
+      com.ddev.site-name: ${DDEV_SITENAME}
+      com.ddev.approot: $DDEV_APPROOT
+    volumes:
+      # oracle *data* is stored on the 'oracle-data' docker volume
+      # This mount is optional; without it your search index disappears
+      # each time the ddev project is stopped and started.
+      - oracle-data:/u01/app/oracle
+
+  # This links the Oracle service to the web service defined in the main
+  # docker-compose.yml, allowing applications running inside the web container to
+  # access the oracle service at http://oracle:1521
+  web:
+    links:
+      - oracle:oracle
+volumes:
+ # oracle is a persistent Docker volume for oracle data
+ # The persistent volume should have the same name as the service so it can be deleted
+ # when the project is deleted.
+ oracle-data:
+   name: "${DDEV_SITENAME}-oracle"
+
+

@@ -1,0 +1,10 @@
+version: '3.6'
+
+services:
+  web:
+    environment:
+      - LD_LIBRARY_PATH=/usr/local/instantclient
+
+  oracle:
+    environment:
+      - ORACLE_ALLOW_REMOTE=true
